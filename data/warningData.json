@@ -1,0 +1,75 @@
+[
+    {
+      "id": "dev1004",
+      "severity": "High",
+      "badgeVariant": "destructive",
+      "title": "آفلاین شد 5 Sensor",
+      "time": "10:45",
+      "description": "اخیراً پاسخ نداده است dev1004 - شناسه",
+      "count": 5
+    },
+    {
+      "id": "dev1012",
+      "severity": "Medium",
+      "badgeVariant": "warning",
+      "title": "ارتباط ناپایدار 2 Sensor",
+      "time": "09:12",
+      "description": "پینگ بالا ثبت شده است dev1012 - شناسه",
+      "count": 2
+    },
+    {
+      "id": "dev1020",
+      "severity": "Low",
+      "badgeVariant": "default",
+      "title": "تاخیر در پاسخ 1 Sensor",
+      "time": "08:03",
+      "description": "پاسخ دیرهنگام دریافت شده dev1020 - شناسه",
+      "count": 1
+    },
+    {
+      "id": "dev1033",
+      "severity": "High",
+      "badgeVariant": "destructive",
+      "title": "آفلاین شد 12 Sensor",
+      "time": "00:22",
+      "description": "قطع کامل ارتباط dev1033 - شناسه",
+      "count": 12
+    },
+    {
+      "id": "dev1045",
+      "severity": "Medium",
+      "badgeVariant": "warning",
+      "title": "هدر رفت داده 3 Sensor",
+      "time": "14:50",
+      "description": "دیتا ناقص ارسال شده dev1045 - شناسه",
+      "count": 3
+    },
+    {
+      "id": "dev1051",
+      "severity": "Low",
+      "badgeVariant": "default",
+      "title": "ارتباط پایدار شد 0 Sensor",
+      "time": "16:05",
+      "description": "وضعیت بازگشت به حالت نرمال dev1051 - شناسه",
+      "count": 0
+    },
+    {
+      "id": "dev1067",
+      "severity": "High",
+      "badgeVariant": "destructive",
+      "title": "آفلاین شد 7 Sensor",
+      "time": "18:30",
+      "description": "اخیراً پاسخ نداده است dev1067 - شناسه",
+      "count": 7
+    },
+    {
+      "id": "dev1078",
+      "severity": "Medium",
+      "badgeVariant": "warning",
+      "title": "نوسان شبکه 4 Sensor",
+      "time": "12:10",
+      "description": "نوسان‌های متعدد در اتصال dev1078 - شناسه",
+      "count": 4
+    }
+  ]
+  

@@ -1,0 +1,7 @@
+[
+  { "title": "داشبورد", "url": "/dashboard", "icon": "LayoutDashboard" },
+  { "title": "دستگاه ها", "url": "/devices", "icon": "Boxes" },
+  { "title": "داده ها", "url": "/datas", "icon": "Database" },
+  { "title": "اتصال", "url": "/conections", "icon": "Wifi" },
+  { "title": "کاربران", "url": "/users", "icon": "User" }
+]
