@@ -58,7 +58,7 @@ export function ScrollAreaSection({
   }, [autoGenerate, interval]);
 
   return (
-    <ScrollArea className="h-84 w-full">
+    <ScrollArea className="h-84 w-full" dir="rtl">
       <div className="space-y-2">
         {messages.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-8">

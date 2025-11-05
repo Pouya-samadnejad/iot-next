@@ -81,12 +81,12 @@ export default function WarningList() {
   }, []);
 
   const sortedAlert = [...warningData].sort(
-    (a, b) => severityOrder[a.severity] - severityOrder[b.severity]
+    (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );
 
   return (
-    <InfoCard title="هشدارها" description="اولویت بندی خودکار">
-      <ScrollArea className="h-96">
+    <div>
+      <ScrollArea className="h-96" dir="rtl">
         {sortedAlert.map((warning) => (
           <WarningCard
             key={warning.id}
@@ -97,6 +97,6 @@ export default function WarningList() {
           />
         ))}
       </ScrollArea>
-    </InfoCard>
+    </div>
   );
 }

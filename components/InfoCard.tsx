@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ReactNode } from "react";
-import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 
 interface InfoCardProps {
   title?: string;

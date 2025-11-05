@@ -11,32 +11,23 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Draggable } from "./Draggable";
-import MqttSection from "./MqttSection";
-import WarningList from "./WarningList";
-import { TempChart } from "./TempChart";
-import { TraficChart } from "./TraficChart";
-import DeviceList from "./DeviceList";
-import { ScrollAreaSection } from "./ui/ScrollAreaSection";
 
 export function SheetSection() {
   const COMPONENTS = [
-    { id: "mqtt", label: "MQtt", component: MqttSection },
-    { id: "warningList", label: "لیست هشدار ها", component: WarningList },
+    { id: "mqtt", label: "MQtt" },
+    { id: "warningList", label: "لیست هشدار ها" },
     {
       id: "temp/humidity",
       label: "چارت دما و رطوبت",
-      component: TempChart,
     },
     {
       id: "trafficChart",
       label: "چارت ترافیک",
-      component: TraficChart,
     },
-    { id: "deviceList", label: "لیست دستگاه ها", component: DeviceList },
+    { id: "deviceList", label: "لیست دستگاه ها" },
     {
       id: "latestActivites",
       label: "آخرین فعالیت ها",
-      component: ScrollAreaSection,
     },
   ];
 
