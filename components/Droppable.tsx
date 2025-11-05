@@ -1,7 +1,7 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { forwardRef, useImperativeHandle, useState, Fragment } from "react";
+import { Fragment } from "react";
 import MqttSection from "./MqttSection";
 import WarningList from "./WarningList";
 import { TempChart } from "./TempChart";
@@ -15,24 +15,27 @@ import {
   ResizablePanelGroup,
 } from "./ui/resizable";
 
-interface DroppableItem {
+// ۱. این اینترفیس را export می‌کنیم تا PageBuilder هم از آن استفاده کند
+export interface DroppableItem {
   id: string;
   type: string;
 }
 
-export interface DroppableRef {
-  addWidget: (type: string) => void;
+// تابع کمکی برای تقسیم آرایه به ردیف‌های ۲تایی
+function chunkArray<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
 }
 
-const Droppable = forwardRef<DroppableRef>((_, ref) => {
+// ۲. کامپوننت به یک فانکشن ساده تبدیل شد
+// دیگر نه از forwardRef خبری هست و نه از useImperativeHandle
+const Droppable = ({ widgets }: { widgets: DroppableItem[] }) => {
   const { isOver, setNodeRef } = useDroppable({ id: "droppable" });
-  const [widgets, setWidgets] = useState<DroppableItem[]>([]);
 
-  useImperativeHandle(ref, () => ({
-    addWidget(type: string) {
-      setWidgets((prev) => [...prev, { id: `${type}-${Date.now()}`, type }]);
-    },
-  }));
+  // ۳. استیت (useState) از اینجا حذف شد
 
   function renderWidget(widget: DroppableItem) {
     switch (widget.type) {
@@ -84,38 +87,43 @@ const Droppable = forwardRef<DroppableRef>((_, ref) => {
   return (
     <div
       ref={setNodeRef}
-      className={`h-fit p-6 border-2 border-dashed rounded-xl transition-colors  ${
+      className={`h-fit min-h-[100px] p-6 border-2 border-dashed rounded-xl transition-colors  ${
         isOver ? "border-blue-500 bg-blue-50" : "border-gray-200"
       }`}
     >
+      {/* ۴. کامپوننت حالا از props.widgets استفاده می‌کند */}
       {widgets.length === 0 ? (
         <p className="text-gray-400 text-center">
           ویجت‌ها را از پنل بکشید و در اینجا رها کنید
         </p>
       ) : (
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="min-h-[200px] grid grid-cols-2 rounded-lg"
-        >
-          {widgets.map((w, index) => (
-            <Fragment key={w.id}>
-              <ResizablePanel
-                defaultSize={100 / widgets.length}
-                minSize={25}
-                className="p-2"
-              >
-                {renderWidget(w)}
-              </ResizablePanel>
-              {index < widgets.length - 1 && (
-                <ResizableHandle className="mx-1" />
-              )}
-            </Fragment>
+        <div className="flex flex-col gap-4">
+          {chunkArray(widgets, 2).map((rowWidgets, rowIndex) => (
+            <ResizablePanelGroup
+              key={rowIndex}
+              direction="horizontal"
+              className="min-h-[200px] rounded-lg border"
+            >
+              {rowWidgets.map((w, widgetIndex) => (
+                <Fragment key={w.id}>
+                  <ResizablePanel
+                    defaultSize={100 / rowWidgets.length}
+                    minSize={25}
+                    className="p-2"
+                  >
+                    {renderWidget(w)}
+                  </ResizablePanel>
+                  {widgetIndex < rowWidgets.length - 1 && (
+                    <ResizableHandle className="mx-1" />
+                  )}
+                </Fragment>
+              ))}
+            </ResizablePanelGroup>
           ))}
-        </ResizablePanelGroup>
+        </div>
       )}
     </div>
   );
-});
+};
 
-Droppable.displayName = "Droppable";
 export default Droppable;
