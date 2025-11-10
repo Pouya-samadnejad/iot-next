@@ -1,18 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-
 import { Bell, Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { SidebarTrigger } from "./ui/sidebar";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Popover, PopoverContent } from "./ui/popover";
 
-export default function DashboardHeader() {
+export default function Header() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "light"; // SSR-safe
     const savedTheme = localStorage.getItem("theme") as "light" | "dark";
-    if (savedTheme) {
-      return savedTheme;
-    }
+    if (savedTheme) return savedTheme;
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
@@ -42,7 +40,7 @@ export default function DashboardHeader() {
         <Popover>
           <PopoverTrigger>
             <Bell className="h-5 w-5 cursor-pointer" />
-          </PopoverTrigger>{" "}
+          </PopoverTrigger>
           <PopoverContent className="mt-2.5">
             هیچ هشداری وجود ندارد
           </PopoverContent>

@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/App-sidebar";
-import DashboardHeader from "@/components/Header";
+import Header from "@/components/Header";
 
-export const iranyekan = localFont({
+const iranyekan = localFont({
   src: [
     {
       path: "../public/fonts/IRANYekanXFaNum-Thin.woff2",
@@ -67,7 +67,7 @@ export default function RootLayout({
           <div className="flex gap-4 w-full">
             <AppSidebar />
             <main className="w-full ">
-              <DashboardHeader />
+              <Header />
               {children}{" "}
             </main>
           </div>

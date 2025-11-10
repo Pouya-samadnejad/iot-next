@@ -9,13 +9,11 @@ import {
   useSensor,
   closestCenter,
 } from "@dnd-kit/core";
-import { useState } from "react";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Droppable from "./Droppable";
 import { SheetSection } from "./SheetSection";
-import { DroppableItem } from "./DroppableItem"; // ⬅️ وارد کردن اینترفیس
+import { useWidgetStore } from "@/store/useWidgetStore";
 
-// تابع کمکی برای تقسیم آرایه به ردیف‌های ۲تایی (برای مرتب‌سازی ردیف‌ها)
 function chunkArray<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -25,7 +23,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 
 export default function PageBuilder() {
-  const [widgets, setWidgets] = useState<DroppableItem[]>([]);
+  const { widgets, addWidget, removeWidget, reorderWidgets } = useWidgetStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -34,35 +32,19 @@ export default function PageBuilder() {
     }),
   );
 
-  const handleRemoveWidget = (idToRemove: string) => {
-    // به‌روزرسانی State با فیلتر کردن ویجت مورد نظر
-    setWidgets((prevWidgets) =>
-      prevWidgets.filter((widget) => widget.id !== idToRemove),
-    );
-  };
-
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    // ۱. اضافه کردن ویجت جدید به منطقه دراپ (Droppable)
+    // ۱. اضافه کردن ویجت جدید به Droppable
     if (over?.id === "droppable") {
-      setWidgets((prev) => [
-        ...prev,
-        {
-          id: `${active.id}-${Date.now()}`, // ساخت یک ID یونیک
-          type: active.id as string, // active.id همان نوع ویجت است
-        },
-      ]);
+      addWidget(active.id as string);
     }
-    // ۲. مرتب‌سازی (Sorting) ردیف‌ها
+    // ۲. مرتب‌سازی (Sorting)
     else if (active.id !== over?.id) {
       const activeId = active.id.toString();
       const overId = over?.id.toString();
 
-      // ایجاد ساختار ردیفی فعلی
       const chunkedWidgets = chunkArray(widgets, 2);
-
-      // پیدا کردن ID اولین ویجت در هر ردیف (که به عنوان ID ردیف در SortableItem استفاده شده)
       const rowIds = chunkedWidgets
         .map((row) => row[0]?.id)
         .filter((id) => id !== undefined);
@@ -70,19 +52,14 @@ export default function PageBuilder() {
       const oldRowIndex = rowIds.indexOf(activeId);
       const newRowIndex = rowIds.indexOf(overId);
 
-      // تنها در صورتی که IDها در لیست IDهای ردیف وجود داشته باشند، مرتب‌سازی ردیف‌ها انجام می‌شود.
       if (oldRowIndex !== -1 && newRowIndex !== -1) {
-        // جابه‌جایی ردیف‌ها
         const newChunkedWidgets = arrayMove(
           chunkedWidgets,
           oldRowIndex,
           newRowIndex,
         );
 
-        // برگرداندن به آرایه تخت widgets
-        const newWidgets = newChunkedWidgets.flat().filter((w) => w); // فیلتر کردن null/undefined
-
-        setWidgets(newWidgets);
+        reorderWidgets(newChunkedWidgets.flat().filter(Boolean));
       }
     }
   }
@@ -93,10 +70,10 @@ export default function PageBuilder() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className=" space-y-2 min-h-screen ">
+      <div className="space-y-2 min-h-screen">
         <SheetSection />
-        <main className="flex-1 rounded-xl h-svh ">
-          <Droppable widgets={widgets} onRemoveWidget={handleRemoveWidget} />
+        <main className="flex-1 rounded-xl h-svh">
+          <Droppable />
         </main>
       </div>
     </DndContext>

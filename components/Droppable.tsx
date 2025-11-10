@@ -1,7 +1,7 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import MqttSection from "./MqttSection";
 import WarningList from "./WarningList";
 import { TempChart } from "./TempChart";
@@ -16,14 +16,9 @@ import {
 } from "./ui/resizable";
 import { Button } from "./ui/button";
 import { XIcon } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { useWidgetStore } from "@/store/useWidgetStore";
 
-// ۱. این اینترفیس را export می‌کنیم تا PageBuilder هم از آن استفاده کند
-export interface DroppableItem {
-  id: string;
-  type: string;
-}
-
+// —————————————————————————————
 // تابع کمکی برای تقسیم آرایه به ردیف‌های ۲تایی
 function chunkArray<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
@@ -33,155 +28,111 @@ function chunkArray<T>(array: T[], size: number): T[][] {
   return chunks;
 }
 
-// ۲. کامپوننت به یک فانکشن ساده تبدیل شد
-// دیگر نه از forwardRef خبری هست و نه از useImperativeHandle
-const Droppable = ({
-  widgets,
-  onRemoveWidget,
-}: {
-  widgets: DroppableItem[];
-  onRemoveWidget: (id: string) => void;
-}) => {
+// —————————————————————————————
+const Droppable = () => {
   const { isOver, setNodeRef } = useDroppable({ id: "droppable" });
+  const { widgets, removeWidget } = useWidgetStore(); // از Zustand
 
-  const handleClose = (id: string) => {
-    onRemoveWidget(id);
-  };
+  const renderWidget = (widget: { id: string; type: string }) => {
+    const removeButton = (
+      <Button
+        className="w-5 h-5 rounded-full"
+        variant="ghost"
+        onClick={() => removeWidget(widget.id)}
+      >
+        <XIcon size={14} />
+      </Button>
+    );
 
-  // ۳. استیت (useState) از اینجا حذف شد
-
-  function renderWidget(widget: DroppableItem) {
     switch (widget.type) {
       case "mqtt":
         return (
           <InfoCard
-            title=" MQTT اتصال "
+            title="اتصال MQTT"
             description="WebSocket حالت نمایشی"
             className="h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <MqttSection />
           </InfoCard>
         );
+
       case "temp/humidity":
         return (
           <InfoCard
-            title="تله متری محیط"
+            title="تله‌متری محیط"
             description="دما و رطوبت آخرین ۵۰ نمونه"
             className="w-full h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <TempChart />
           </InfoCard>
         );
+
       case "trafficChart":
         return (
           <InfoCard
             title="ترافیک شبکه"
-            description="پیام دقیقه"
+            description="پیام در دقیقه"
             className="w-full h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <TraficChart />
           </InfoCard>
         );
+
       case "deviceList":
         return (
           <InfoCard
-            title="لیست دستگاه ها"
+            title="لیست دستگاه‌ها"
             className="w-full h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <DeviceList />
           </InfoCard>
         );
+
       case "warningList":
         return (
           <InfoCard
             title="هشدارها"
-            description="اولویت بندی خودکار"
+            description="اولویت‌بندی خودکار"
             className="w-full h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <WarningList />
           </InfoCard>
         );
-      case "latestActivites":
+
+      case "latestActivities":
         return (
           <InfoCard
             title="فعالیت اخیر"
             description="آخرین رویدادها"
             className="h-full"
-            action={
-              <Button
-                className="w-5 h-5 rounded-full"
-                variant="ghost"
-                onClick={() => handleClose(widget.id)}
-              >
-                <XIcon />
-              </Button>
-            }
+            action={removeButton}
           >
             <ScrollAreaSection />
           </InfoCard>
         );
+
       default:
         return (
-          <div className="p-3 bg-gray-200 h-1/2 rounded-lg">
+          <div className="p-3 bg-gray-200 rounded-lg text-center">
             ویجت ناشناخته: {widget.type}
           </div>
         );
     }
-  }
+  };
 
+  // —————————————————————————————
   return (
     <div
       ref={setNodeRef}
-      className={` min-h-1/2 p-6 border border-dashed rounded-xl  transition-colors  ${
-        isOver ? "border-blue-500 bg-blue-50" : "border-gray-200 h-fit"
+      className={`min-h-[400px] p-6 border-2 border-dashed rounded-xl transition-colors ${
+        isOver ? "border-blue-500 bg-blue-50" : "border-gray-200"
       }`}
     >
-      {/* ۴. کامپوننت حالا از props.widgets استفاده می‌کند */}
       {widgets.length === 0 ? (
         <p className="text-gray-400 text-center">
           ویجت‌ها را از پنل بکشید و در اینجا رها کنید
@@ -192,7 +143,7 @@ const Droppable = ({
             <ResizablePanelGroup
               key={rowIndex}
               direction="horizontal"
-              className="min-h-[200px] rounded-lg "
+              className="min-h-[250px] rounded-lg"
             >
               {rowWidgets.map((w, widgetIndex) => (
                 <Fragment key={w.id}>

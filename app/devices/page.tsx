@@ -1,14 +1,19 @@
+import DeviceButton from "@/components/DeviceButton";
 import DeviceList from "@/components/DeviceList";
-import DeviceSearchBar from "@/components/DeviceSearchBar";
+import InfoCard from "@/components/InfoCard";
+
 
 export default function DevicesPage() {
   return (
-    <main>
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">لیست دستگاه‌ها</h1>
-      </div>
-
+    <InfoCard
+      title="فهرست دستگاه ها"
+      description="کنترل سریع و وضعیت سلامت"
+      action={
+        <DeviceButton/>
+     
+      }
+    >
       <DeviceList />
-    </main>
+    </InfoCard>
   );
 }
