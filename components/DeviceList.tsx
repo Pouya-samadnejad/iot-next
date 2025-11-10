@@ -1,65 +1,47 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useMemo } from "react";
 import DeviceCard from "./DeviceCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 import { SearchIcon } from "lucide-react";
-import { Spinner } from "./ui/spinner";
-
-interface Device {
-  device_id: string;
-  device_name: string;
-  type: string;
-  firmware_version: string;
-  battery_level: number;
-  rssi: number;
-  last_seen: string;
-  status: boolean;
-  power?: boolean;
-}
+import { useDeviceStore } from "@/store/deviceStore";
 
 export default function DeviceList() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const allDevices = useDeviceStore((state) => state.devices);
+
+  // مدیریت جستجوی URL
   const query = searchParams.get("q") ?? "";
 
-  useEffect(() => {
-    const fetchDevices = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/devices/search?q=${encodeURIComponent(query)}`
-        );
-        const data = await response.json();
-        setDevices(data.devices);
-      } catch (error) {
-        console.error("Error fetching devices:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // فیلتر و جستجو
+  const filteredDevices = useMemo(() => {
+    if (!query) return allDevices;
 
-    fetchDevices();
-  }, [query]);
+    const lowerQuery = query.toLowerCase();
+    return allDevices.filter(
+      (device) =>
+        device.device_name.toLowerCase().includes(lowerQuery) ||
+        device.device_id.toLowerCase().includes(lowerQuery) ||
+        device.type.toLowerCase().includes(lowerQuery),
+    );
+  }, [allDevices, query]);
 
+  // تغییر مقدار جستجو و به‌روزرسانی URL
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value.trim();
     const params = new URLSearchParams(searchParams);
 
-    if (newQuery) {
-      params.set("q", newQuery);
-    } else {
-      params.delete("q");
-    }
+    if (newQuery) params.set("q", newQuery);
+    else params.delete("q");
 
     router.push(`?${params.toString()}`);
   };
 
   return (
     <div className="space-y-4">
-      <InputGroup className="lg:w-1/4 md:w-1/2 lg:my-2 ">
+      <InputGroup className="lg:w-1/4 md:w-1/2 lg:my-2">
         <InputGroupInput
           type="text"
           placeholder="جستجو دستگاه / نوع / شناسه"
@@ -73,13 +55,9 @@ export default function DeviceList() {
         </InputGroupAddon>
       </InputGroup>
 
-      {isLoading ? (
-        <div className="flex justify-center">
-          <Spinner />
-        </div>
-      ) : devices.length > 0 ? (
+      {filteredDevices.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {devices.map((device: Device) => (
+          {filteredDevices.map((device) => (
             <DeviceCard
               key={device.device_id}
               id={device.device_id}

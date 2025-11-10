@@ -23,7 +23,7 @@ export default function DeviceButton() {
       <DialogSection
         trigger={
           <DialogTrigger>
-            <div className="bg-neutral-200 text-black hover:bg-neutral-300 shadow flex items-center py-1 px-1.5 rounded-sm ">
+            <div className="bg-neutral-200 text-black hover:bg-neutral-300 shadow flex items-center py-1.5 px-2 rounded-md ">
               افزودن دستگاه <ScanLine />
             </div>
           </DialogTrigger>
