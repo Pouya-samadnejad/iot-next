@@ -20,7 +20,6 @@ export function SortableItem({
     isDragging,
   } = useSortable({ id: id });
 
-  // تنظیم استایل‌های لازم برای انیمیشن و تبدیل (transform)
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
@@ -32,14 +31,7 @@ export function SortableItem({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      // listeners و attributes را به عنصر قابل کشیدن اعمال می‌کنیم.
-      // می‌توان listeners را روی یک دستگیره (handle) خاص اعمال کرد، اما اینجا روی کل آیتم اعمال شده.
-      {...attributes}
-      {...listeners}
-    >
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {children}
     </div>
   );

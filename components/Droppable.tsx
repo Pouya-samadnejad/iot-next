@@ -129,7 +129,7 @@ const Droppable = () => {
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[400px] p-6 border-2 border-dashed rounded-xl transition-colors ${
+      className={`min-h-[400px] border-2 border-dashed rounded-xl transition-colors ${
         isOver ? "border-blue-500 bg-blue-50" : "border-gray-200"
       }`}
     >

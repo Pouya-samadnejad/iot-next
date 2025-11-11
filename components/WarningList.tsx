@@ -1,5 +1,4 @@
 "use client";
-import InfoCard from "@/components/InfoCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import WarningCard from "@/components/WarningCard";
 import { useState, useEffect } from "react";

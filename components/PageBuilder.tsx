@@ -23,7 +23,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 
 export default function PageBuilder() {
-  const { widgets, addWidget, removeWidget, reorderWidgets } = useWidgetStore();
+  const { widgets, addWidget, reorderWidgets } = useWidgetStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor),

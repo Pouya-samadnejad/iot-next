@@ -34,7 +34,7 @@ export function SheetSection() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline">ویجت ها</Button>
+        <Button>ویجت ها</Button>
       </SheetTrigger>
       <SheetContent side="left">
         <SheetHeader dir="rtl">

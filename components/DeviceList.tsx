@@ -28,7 +28,6 @@ export default function DeviceList() {
     );
   }, [allDevices, query]);
 
-  // تغییر مقدار جستجو و به‌روزرسانی URL
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value.trim();
     const params = new URLSearchParams(searchParams);
