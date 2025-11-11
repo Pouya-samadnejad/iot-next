@@ -1,3 +1,4 @@
+"use client";
 import * as Icons from "lucide-react";
 import itemsData from "../data/sidebarItems.json";
 import {
@@ -13,8 +14,10 @@ import {
 
 import type { FC, SVGProps } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function AppSidebar() {
+  const pathName = usePathname();
   return (
     <Sidebar side="right" collapsible="icon" variant="floating">
       <SidebarContent>
@@ -26,10 +29,15 @@ export function AppSidebar() {
                 const Icon = Icons[item.icon as keyof typeof Icons] as FC<
                   SVGProps<SVGSVGElement>
                 >;
+                const isActive = pathName === item.url;
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton className="py-6" asChild>
+                    <SidebarMenuButton
+                      className="py-6"
+                      asChild
+                      isActive={isActive}
+                    >
                       <Link href={item.url} className="flex items-center gap-2">
                         <Icon className="w-10 h-10" />
                         <span className="text-base">{item.title}</span>
@@ -39,6 +47,7 @@ export function AppSidebar() {
                 );
               })}
             </SidebarMenu>
+            ‍
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

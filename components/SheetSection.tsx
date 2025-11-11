@@ -37,9 +37,9 @@ export function SheetSection() {
         <Button>ویجت ها</Button>
       </SheetTrigger>
       <SheetContent side="left">
-        <SheetHeader dir="rtl">
-          <SheetTitle> ویجت ها</SheetTitle>
-          <SheetDescription>
+        <SheetHeader>
+          <SheetTitle className="text-center"> ویجت ها</SheetTitle>
+          <SheetDescription className="text-center">
             ویجت مورد نیاز را انتخاب کنید بکشید و در صفحه بیاندازید{" "}
           </SheetDescription>
         </SheetHeader>
