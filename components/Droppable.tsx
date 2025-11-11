@@ -1,3 +1,4 @@
+// Droppable.js
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
@@ -15,10 +16,11 @@ import {
   ResizablePanelGroup,
 } from "./ui/resizable";
 import { Button } from "./ui/button";
-import { XIcon } from "lucide-react";
+// 💡 اضافه کردن آیکون برای Drag Handle
+import { XIcon, MoreVertical } from "lucide-react";
 import { useWidgetStore } from "@/store/useWidgetStore";
+import { SortableItem } from "./SortableItem";
 
-// —————————————————————————————
 // تابع کمکی برای تقسیم آرایه به ردیف‌های ۲تایی
 function chunkArray<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
@@ -28,20 +30,48 @@ function chunkArray<T>(array: T[], size: number): T[][] {
   return chunks;
 }
 
-// —————————————————————————————
 const Droppable = () => {
   const { isOver, setNodeRef } = useDroppable({ id: "droppable" });
-  const { widgets, removeWidget } = useWidgetStore(); // از Zustand
+  const { widgets, removeWidget } = useWidgetStore();
 
-  const renderWidget = (widget: { id: string; type: string }) => {
+  // 💡 این تابع اکنون sortProps را برای اعمال listeners می‌پذیرد
+  const renderWidget = (
+    widget: { id: string; type: string },
+    sortProps: { attributes: any; listeners: any },
+  ) => {
+    // --- دکمه حذف (با توقف رویداد) ---
     const removeButton = (
       <Button
         className="w-5 h-5 rounded-full"
         variant="ghost"
-        onClick={() => removeWidget(widget.id)}
+        onClick={(e) => {
+          e.stopPropagation(); // 👈🏼 توقف انتشار به SortableItem
+          e.preventDefault(); // 👈🏼 جلوگیری از تداخل با شروع Drag
+          removeWidget(widget.id);
+        }}
       >
         <XIcon size={14} />
       </Button>
+    );
+
+    // --- Drag Handle (فقط برای شروع درگ) ---
+    const dragHandle = (
+      <Button
+        className="w-5 h-5 rounded-full touch-none"
+        variant="ghost"
+        {...sortProps.attributes} // 👈🏼 اعمال attributes برای Accessibility
+        {...sortProps.listeners} // 👈🏼 اعمال listeners برای شروع Drag (فقط با کلیک روی این دکمه)
+      >
+        <MoreVertical size={14} className="cursor-grab" />
+      </Button>
+    );
+
+    // ترکیب دکمه‌ها در یک Action بار
+    const combinedActions = (
+      <div className="flex items-center space-x-1 rtl:space-x-reverse">
+        {dragHandle}
+        {removeButton}
+      </div>
     );
 
     switch (widget.type) {
@@ -51,7 +81,7 @@ const Droppable = () => {
             title="اتصال MQTT"
             description="WebSocket حالت نمایشی"
             className="h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <MqttSection />
           </InfoCard>
@@ -63,7 +93,7 @@ const Droppable = () => {
             title="تله‌متری محیط"
             description="دما و رطوبت آخرین ۵۰ نمونه"
             className="w-full h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <TempChart />
           </InfoCard>
@@ -75,7 +105,7 @@ const Droppable = () => {
             title="ترافیک شبکه"
             description="پیام در دقیقه"
             className="w-full h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <TraficChart />
           </InfoCard>
@@ -86,7 +116,7 @@ const Droppable = () => {
           <InfoCard
             title="لیست دستگاه‌ها"
             className="w-full h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <DeviceList />
           </InfoCard>
@@ -98,7 +128,7 @@ const Droppable = () => {
             title="هشدارها"
             description="اولویت‌بندی خودکار"
             className="w-full h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <WarningList />
           </InfoCard>
@@ -110,7 +140,7 @@ const Droppable = () => {
             title="فعالیت اخیر"
             description="آخرین رویدادها"
             className="h-full"
-            action={removeButton}
+            action={combinedActions}
           >
             <ScrollAreaSection />
           </InfoCard>
@@ -118,14 +148,13 @@ const Droppable = () => {
 
       default:
         return (
-          <div className="p-3 bg-gray-200 rounded-lg text-center">
+          <InfoCard action={combinedActions}>
             ویجت ناشناخته: {widget.type}
-          </div>
+          </InfoCard>
         );
     }
   };
 
-  // —————————————————————————————
   return (
     <div
       ref={setNodeRef}
@@ -134,11 +163,11 @@ const Droppable = () => {
       }`}
     >
       {widgets.length === 0 ? (
-        <p className="text-gray-400 text-center">
+        <p className="text-gray-400 text-center p-8">
           ویجت‌ها را از پنل بکشید و در اینجا رها کنید
         </p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4">
           {chunkArray(widgets, 2).map((rowWidgets, rowIndex) => (
             <ResizablePanelGroup
               key={rowIndex}
@@ -150,9 +179,15 @@ const Droppable = () => {
                   <ResizablePanel
                     defaultSize={100 / rowWidgets.length}
                     minSize={25}
-                    className="p-2"
+                    className="p-1" // کمی فضای داخلی کمتر
                   >
-                    {renderWidget(w)}
+                    {/* 👈🏼 استفاده از SortableItem به عنوان Render Prop */}
+                    <SortableItem id={w.id}>
+                      {({ attributes, listeners }) =>
+                        // 👈🏼 ارسال attributes و listeners به renderWidget
+                        renderWidget(w, { attributes, listeners })
+                      }
+                    </SortableItem>
                   </ResizablePanel>
                   {widgetIndex < rowWidgets.length - 1 && (
                     <ResizableHandle className="mx-1" />

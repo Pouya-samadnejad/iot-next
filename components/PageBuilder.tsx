@@ -3,24 +3,21 @@
 import {
   DndContext,
   DragEndEvent,
-  KeyboardSensor,
   PointerSensor,
+  KeyboardSensor,
   useSensors,
   useSensor,
   closestCenter,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import Droppable from "./Droppable";
 import { SheetSection } from "./SheetSection";
 import { useWidgetStore } from "@/store/useWidgetStore";
-
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
-}
 
 export default function PageBuilder() {
   const { widgets, addWidget, reorderWidgets } = useWidgetStore();
@@ -32,37 +29,34 @@ export default function PageBuilder() {
     }),
   );
 
-  function handleDragEnd(event: DragEndEvent) {
+  const validTypes = [
+    "mqtt",
+    "temp/humidity",
+    "trafficChart",
+    "deviceList",
+    "warningList",
+    "latestActivities",
+  ];
+
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over || active.id === over.id) return;
 
-    // ۱. اضافه کردن ویجت جدید به Droppable
-    if (over?.id === "droppable") {
+    // اضافه کردن ویجت جدید
+    if (over.id === "droppable" && validTypes.includes(active.id as string)) {
       addWidget(active.id as string);
+      return;
     }
-    // ۲. مرتب‌سازی (Sorting)
-    else if (active.id !== over?.id) {
-      const activeId = active.id.toString();
-      const overId = over?.id.toString();
 
-      const chunkedWidgets = chunkArray(widgets, 2);
-      const rowIds = chunkedWidgets
-        .map((row) => row[0]?.id)
-        .filter((id) => id !== undefined);
+    // جابه‌جایی ویجت‌های موجود
+    const oldIndex = widgets.findIndex((w) => w.id === active.id);
+    const newIndex = widgets.findIndex((w) => w.id === over.id);
 
-      const oldRowIndex = rowIds.indexOf(activeId);
-      const newRowIndex = rowIds.indexOf(overId);
-
-      if (oldRowIndex !== -1 && newRowIndex !== -1) {
-        const newChunkedWidgets = arrayMove(
-          chunkedWidgets,
-          oldRowIndex,
-          newRowIndex,
-        );
-
-        reorderWidgets(newChunkedWidgets.flat().filter(Boolean));
-      }
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const updated = arrayMove(widgets, oldIndex, newIndex);
+      reorderWidgets(updated);
     }
-  }
+  };
 
   return (
     <DndContext
@@ -73,7 +67,12 @@ export default function PageBuilder() {
       <div className="space-y-2 min-h-screen">
         <SheetSection />
         <main className="flex-1 rounded-xl h-svh">
-          <Droppable />
+          <SortableContext
+            items={widgets.map((w) => w.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <Droppable />
+          </SortableContext>
         </main>
       </div>
     </DndContext>

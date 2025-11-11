@@ -1,38 +1,36 @@
-// SortableItem.tsx
+// SortableItem.js
+"use client";
 
-import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import React from "react";
 
-export function SortableItem({
-  id,
-  children,
-}: {
+// تعریف نوع Props برای Render Prop
+interface SortableItemProps {
   id: string;
-  children: React.ReactNode;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: id });
+  // children اکنون یک تابع است که Propsهای dnd-kit را دریافت و المان فرزند را رندر می‌کند
+  children: (sortProps: {
+    attributes: any;
+    listeners: any;
+    style: React.CSSProperties;
+  }) => React.ReactNode;
+}
 
-  const style = {
-    transition,
+export const SortableItem = ({ id, children }: SortableItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  // استایل‌های Transform و Transition برای جابجایی انیمیشنی
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    opacity: isDragging ? 0.5 : 1, // کمی ویجت را محو می‌کند
-    // اضافه کردن پدینگ یا مارجین برای بهبود تجربه Drag
-    padding: "0px",
-    zIndex: isDragging ? 100 : "auto", // برای اینکه ویجت کشیده شده بالای بقیه قرار گیرد
-    boxSizing: "border-box",
+    transition,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
+    // رفرنس (ref) و استایل‌ها به عنصر والد SortableItem اعمال می‌شود
+    <div ref={setNodeRef} style={style} className="h-full w-full">
+      {/* 👈🏼 فراخوانی تابع children و ارسال propsهای dnd-kit */}
+      {children({ attributes, listeners, style })}
     </div>
   );
-}
+};
