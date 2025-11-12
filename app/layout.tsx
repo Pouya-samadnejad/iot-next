@@ -5,6 +5,7 @@ import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/App-sidebar";
 import Header from "@/components/Header";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const iranyekan = localFont({
   src: [
@@ -61,17 +62,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className={`${iranyekan.className}  antialiased`}>
-        <SidebarProvider dir="rtl">
-          <div className="flex gap-4 w-full">
-            <AppSidebar />
-            <main className="w-full ">
-              <Header />
-              {children}{" "}
-            </main>
-          </div>
-        </SidebarProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SidebarProvider dir="rtl">
+            <div className="flex gap-4 w-full">
+              <AppSidebar />
+              <main className="w-full ">
+                <Header />
+                {children}{" "}
+              </main>
+            </div>
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

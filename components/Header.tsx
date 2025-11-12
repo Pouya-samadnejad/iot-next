@@ -1,31 +1,10 @@
-"use client";
-import { useState, useEffect } from "react";
-import { Bell, Moon, Sun } from "lucide-react";
-import { Button } from "./ui/button";
+import { Bell } from "lucide-react";
 import { SidebarTrigger } from "./ui/sidebar";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Popover, PopoverContent } from "./ui/popover";
+import { ModeToggle } from "./ui/ModeButton";
 
 export default function Header() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light"; // SSR-safe
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark";
-    if (savedTheme) return savedTheme;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
   return (
     <header className="flex items-center justify-between gap-4 w-full py-2 px-4 border-b bg-background mb-2">
       <div className="flex items-center gap-4">
@@ -47,18 +26,7 @@ export default function Header() {
         </Popover>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          >
-            {theme === "light" ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )}
-          </Button>
+          <ModeToggle />
         </div>
       </div>
     </header>
