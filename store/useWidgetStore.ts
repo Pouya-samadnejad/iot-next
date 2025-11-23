@@ -4,6 +4,10 @@ import { persist } from "zustand/middleware";
 export interface DroppableItem {
   id: string;
   type: string;
+  x?: number;
+  y?: number;
+  w?: number; // عرض
+  h?: number; // ارتفاع
 }
 
 interface WidgetStore {

@@ -1,3 +1,4 @@
+import DashborderGrid from "@/components/DashboardGrid";
 import InfoCard from "@/components/InfoCard";
 import PageBuilder from "@/components/PageBuilder";
 import { BellDot, Gauge, Server, Wifi } from "lucide-react";
@@ -56,7 +57,7 @@ export default function page() {
           </InfoCard>
         ))}
       </div>
-      <PageBuilder></PageBuilder>
+      <DashborderGrid />
     </main>
   );
 }

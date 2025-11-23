@@ -1,22 +1,28 @@
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { ReactNode } from "react";
+"use client";
 
-type DraggableProps = {
-  children: ReactNode;
+import React, { DragEvent } from "react";
+
+interface DraggableProps {
   id: string;
-};
-export function Draggable({ children, id }: DraggableProps) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: id,
-  });
-  const style = {
-    transform: CSS.Translate.toString(transform),
+  children: React.ReactNode;
+}
+
+export const Draggable: React.FC<DraggableProps> = ({ id, children }) => {
+  const handleDragStart = (e: DragEvent<HTMLDivElement>) => {
+    // ست کردن داده‌ها
+    e.dataTransfer.setData("widget-id", id);
+    e.dataTransfer.effectAllowed = "copy";
+    console.log("Drag Started:", id); // برای تست
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div
+      draggable={true}
+      onDragStart={handleDragStart}
+      className="cursor-grab mb-3 p-2 border rounded bg-white shadow-sm hover:bg-gray-50"
+      style={{ zIndex: 1000 }}
+    >
       {children}
     </div>
   );
-}
+};

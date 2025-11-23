@@ -32,7 +32,7 @@ export function SheetSection() {
   ];
 
   return (
-    <Sheet>
+    <Sheet modal={false}>
       <SheetTrigger asChild>
         <Button>ویجت ها</Button>
       </SheetTrigger>
